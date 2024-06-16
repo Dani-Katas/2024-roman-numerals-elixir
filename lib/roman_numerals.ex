@@ -18,27 +18,8 @@ defmodule RomanNumerals do
     @roman_none
   ]
 
-  defp next(roman) do
-    index = Enum.find_index(@romans, &(&1 == roman))
-    Enum.at(@romans, index + 1)
-  end
-
-  defp can_be_subtracted?(roman) do
-    roman.value
-    |> Integer.to_string()
-    |> String.contains?("5")
-    |> Kernel.not()
-  end
-
-  defp subtractive_pair(roman) do
-    @romans
-    |> Enum.filter(&can_be_subtracted?/1)
-    |> Enum.filter(&( &1.value < roman.value ))
-    |> List.first
-  end
-
   def to_roman(number) do
-    from_arabic(number) |> Enum.map(&( &1.symbol )) |> Enum.join
+    from_arabic(number) |> Enum.map(& &1.symbol) |> Enum.join()
   end
 
   defp from_arabic(number) do
@@ -55,12 +36,32 @@ defmodule RomanNumerals do
 
   defp from_arabic(number, roman) do
     subtractive_numeral = subtractive_pair(roman)
-    subtract_value = (roman.value - subtractive_numeral.value)
+    subtract_value = roman.value - subtractive_numeral.value
     can_subtract = number >= subtract_value
+
     if can_subtract do
       [subtractive_numeral, roman | from_arabic(number - subtract_value)]
     else
       from_arabic(number, next(roman))
     end
+  end
+
+  defp next(roman) do
+    index = Enum.find_index(@romans, &(&1 == roman))
+    Enum.at(@romans, index + 1)
+  end
+
+  defp can_be_subtracted?(roman) do
+    roman.value
+    |> Integer.to_string()
+    |> String.contains?("5")
+    |> Kernel.not()
+  end
+
+  defp subtractive_pair(roman) do
+    @romans
+    |> Enum.filter(&can_be_subtracted?/1)
+    |> Enum.filter(&(&1.value < roman.value))
+    |> List.first()
   end
 end
