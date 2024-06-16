@@ -24,7 +24,7 @@ defmodule RomanNumerals do
   defp get_restable(@roman_v), do: @roman_i
   defp get_restable(@roman_i), do: @roman_none
 
-  def from_arabic_to_roman_string(number) do
+  def to_roman(number) do
     from_arabic(number) |> Enum.map(fn r -> r.symbol end) |> Enum.join()
   end
 

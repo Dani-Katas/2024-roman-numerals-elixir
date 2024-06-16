@@ -19,7 +19,7 @@ defmodule RomanNumeralsTest do
 
   test "it works" do
     for {input, expected} <- @parameters do
-      assert RomanNumerals.from_arabic_to_roman_string(input) == expected
+      assert RomanNumerals.to_roman(input) == expected
     end
   end
 end
