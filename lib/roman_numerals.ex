@@ -7,31 +7,43 @@ defmodule RomanNumerals do
   @roman_v %Roman{symbol: "V", value: 5}
   @roman_i %Roman{symbol: "I", value: 1}
   @roman_none %Roman{symbol: "", value: 0}
+  @romans [
+    @roman_m,
+    @roman_d,
+    @roman_c,
+    @roman_l,
+    @roman_x,
+    @roman_v,
+    @roman_i,
+    @roman_none
+  ]
 
-  defp get_next(@roman_m), do: @roman_d
-  defp get_next(@roman_d), do: @roman_c
-  defp get_next(@roman_c), do: @roman_l
-  defp get_next(@roman_l), do: @roman_x
-  defp get_next(@roman_x), do: @roman_v
-  defp get_next(@roman_v), do: @roman_i
-  defp get_next(@roman_i), do: @roman_none
+  defp next(roman) do
+    index = Enum.find_index(@romans, &(&1 == roman))
+    Enum.at(@romans, index + 1)
+  end
 
-  defp get_restable(@roman_m), do: @roman_c
-  defp get_restable(@roman_d), do: @roman_c
-  defp get_restable(@roman_c), do: @roman_x
-  defp get_restable(@roman_l), do: @roman_x
-  defp get_restable(@roman_x), do: @roman_i
-  defp get_restable(@roman_v), do: @roman_i
-  defp get_restable(@roman_i), do: @roman_none
+  defp can_be_subtracted?(roman) do
+    roman.value
+    |> Integer.to_string()
+    |> String.contains?("5")
+    |> Kernel.not()
+  end
+
+  defp subtractive_pair(roman) do
+    @romans
+    |> Enum.filter(&can_be_subtracted?/1)
+    |> Enum.filter(&( &1.value < roman.value ))
+    |> List.first
+  end
 
   def to_roman(number) do
-    from_arabic(number) |> Enum.map(fn r -> r.symbol end) |> Enum.join()
+    from_arabic(number) |> Enum.map(&( &1.symbol )) |> Enum.join
   end
 
   defp from_arabic(number) do
     number |> from_arabic(@roman_m)
   end
-
 
   defp from_arabic(number, @roman_i) do
     @roman_i |> List.duplicate(number)
@@ -42,13 +54,13 @@ defmodule RomanNumerals do
   end
 
   defp from_arabic(number, roman) do
-    restable = get_restable(roman)
-    should_have_previous_unit = number >= (roman.value - restable.value)
-
-    if should_have_previous_unit do
-      [restable, roman | from_arabic(number - (roman.value - restable.value))]
+    subtractive_numeral = subtractive_pair(roman)
+    subtract_value = (roman.value - subtractive_numeral.value)
+    can_subtract = number >= subtract_value
+    if can_subtract do
+      [subtractive_numeral, roman | from_arabic(number - subtract_value)]
     else
-      from_arabic(number, get_next(roman))
+      from_arabic(number, next(roman))
     end
   end
 end
