@@ -12,28 +12,28 @@ defmodule RomanValue do
   @roman_i %Roman{symbol: "I", value: 1}
   @roman_none %Roman{symbol: "", value: 0}
 
-  def get_next(@roman_m), do: @roman_d
-  def get_next(@roman_d), do: @roman_c
-  def get_next(@roman_c), do: @roman_l
-  def get_next(@roman_l), do: @roman_x
-  def get_next(@roman_x), do: @roman_v
-  def get_next(@roman_v), do: @roman_i
-  def get_next(@roman_i), do: @roman_none
+  defp get_next(@roman_m), do: @roman_d
+  defp get_next(@roman_d), do: @roman_c
+  defp get_next(@roman_c), do: @roman_l
+  defp get_next(@roman_l), do: @roman_x
+  defp get_next(@roman_x), do: @roman_v
+  defp get_next(@roman_v), do: @roman_i
+  defp get_next(@roman_i), do: @roman_none
 
-  def get_restable(@roman_m), do: @roman_c
-  def get_restable(@roman_d), do: @roman_c
-  def get_restable(@roman_c), do: @roman_x
-  def get_restable(@roman_l), do: @roman_x
-  def get_restable(@roman_x), do: @roman_i
-  def get_restable(@roman_v), do: @roman_i
-  def get_restable(@roman_i), do: @roman_none
+  defp get_restable(@roman_m), do: @roman_c
+  defp get_restable(@roman_d), do: @roman_c
+  defp get_restable(@roman_c), do: @roman_x
+  defp get_restable(@roman_l), do: @roman_x
+  defp get_restable(@roman_x), do: @roman_i
+  defp get_restable(@roman_v), do: @roman_i
+  defp get_restable(@roman_i), do: @roman_none
 
-  def from_arabic(number) do
-    from_arabic2(number) |> Enum.map(fn r -> r.symbol end) |> Enum.join()
+  def from_arabic_to_roman_string(number) do
+    from_arabic(number) |> Enum.map(fn r -> r.symbol end) |> Enum.join()
   end
 
-  def from_arabic2(number) do
-    from_arabic(number, @roman_m)
+  defp from_arabic(number) do
+    number |> from_arabic(@roman_m)
   end
 
 
@@ -41,17 +41,18 @@ defmodule RomanValue do
     @roman_i |> List.duplicate(number)
   end
 
-  defp from_arabic(number, roman) do
-    if number >= roman.value do
-      [roman | from_arabic2(number - roman.value)]
-    else
-      restable = get_restable(roman)
+  defp from_arabic(number, roman) when number >= roman.value do
+    [roman | from_arabic(number - roman.value)]
+  end
 
-      if number >= (roman.value - restable.value) do
-        [restable, roman | from_arabic2(number - (roman.value - restable.value))]
-      else
-        from_arabic(number, get_next(roman))
-      end
+  defp from_arabic(number, roman) do
+    restable = get_restable(roman)
+    should_have_previous_unit = number >= (roman.value - restable.value)
+
+    if should_have_previous_unit do
+      [restable, roman | from_arabic(number - (roman.value - restable.value))]
+    else
+      from_arabic(number, get_next(roman))
     end
   end
 end

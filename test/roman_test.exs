@@ -11,13 +11,15 @@ defmodule RomanTest do
     |> Stream.map(fn ([arabic, roman]) -> {arabic |> String.to_integer, roman} end)
     |> Enum.to_list
 
-  for {input, expected} <- @parameters do
-    test "from_arabic(#{input}) == #{expected}" do
-      assert RomanValue.from_arabic(unquote(input)) == unquote(expected)
+  # for {input, expected} <- @parameters do
+  #   test "from_arabic(#{input}) == #{expected}" do
+  #     assert RomanValue.from_arabic_to_roman_string(unquote(input)) == unquote(expected)
+  #   end
+  # end
+
+  test "it works" do
+    for {input, expected} <- @parameters do
+      assert RomanValue.from_arabic_to_roman_string(input) == expected
     end
   end
-
-  #test "four" do
-  #  assert RomanValue.from_arabic(4) == "IV"
-  #end
 end
