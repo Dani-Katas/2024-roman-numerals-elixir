@@ -54,8 +54,7 @@ defmodule RomanNumerals do
   defp can_be_subtracted?(roman) do
     roman.value
     |> Integer.to_string()
-    |> String.contains?("5")
-    |> Kernel.not()
+    |> String.contains?("1")
   end
 
   defp subtractive_pair(roman) do
